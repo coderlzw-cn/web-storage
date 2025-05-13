@@ -1,0 +1,39 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
+  "extends": ["ultracite"],
+  "linter": {
+    "rules": {
+      // 复杂度相关规则
+      // "complexity": {
+      //   "noExcessiveCognitiveComplexity": "off", // 允许复杂函数，Cookie 和 Storage 逻辑较复杂
+      //   "noForEach": "off" // 允许使用 forEach，在某些场景下比 for...of 更清晰
+      // },
+      // 正确性相关规则
+      "correctness": {
+        "noUnusedVariables": "off" // 允许未使用变量，测试代码中的 catch 参数等
+      },
+      // 实验性规则
+      "nursery": {
+        "useConsistentTypeDefinitions": "off" // 允许混用 interface 和 type，保持现有代码风格
+        // "noShadow": "off" // 允许变量遮蔽，测试代码中经常需要重新定义 storage 变量
+      },
+      // 性能相关规则
+      "performance": {
+        "noBarrelFile": "off" // 允许桶文件导出，这是 npm 包的标准做法
+      },
+      // // 代码风格相关规则
+      "style": {
+        "noMagicNumbers": "off" // 允许魔法数字，加密算法和测试中的数字有明确含义
+        //   "useTemplate": "off" // 允许字符串拼接，在某些场景下比模板字符串更清晰
+      },
+      // 可疑代码相关规则
+      "suspicious": {
+        "noConsole": "off", // 允许使用 console，用于调试和错误日志
+        "noDocumentCookie": "off", // 允许直接操作 document.cookie，这是 Cookie 库的核心功能
+        "noGlobalIsNan": "off", // 允许使用全局 isNaN，保持代码简洁
+        "noExplicitAny": "off", // 允许使用 any 类型，通用存储库需要处理任意类型
+        "noEmptyBlockStatements": "off" // 允许空代码块，测试中的 mock 函数等
+      }
+    }
+  }
+}

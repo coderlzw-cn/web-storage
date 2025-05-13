@@ -1,0 +1,32 @@
+# Source code
+src/
+test/
+demo/
+
+# Configuration files
+.gitignore
+.editorconfig
+.prettierrc
+.eslintrc*
+tsconfig.json
+vitest.config.ts
+tsup.config.ts
+
+# Development files
+*.log
+.DS_Store
+.vscode/
+.idea/
+
+# Test files
+coverage/
+.nyc_output
+
+# Build cache
+.cache
+.parcel-cache
+node_modules/
+
+# Git
+.git/
+.github/
