@@ -108,9 +108,9 @@ export default class WebCookie {
       version,
       prefix,
       maxAge,
-      domain,
-      sameSite,
-      onError,
+      ...(domain !== undefined && { domain }),
+      ...(sameSite !== undefined && { sameSite }),
+      ...(onError !== undefined && { onError }),
     });
 
     // 设置属性
@@ -654,7 +654,7 @@ export default class WebCookie {
       }
 
       // 检查数据版本
-      if (!this.checkVersion(cookieItem, key, fullKey)) {
+      if (!this.checkVersion(cookieItem, key)) {
         return null;
       }
 
