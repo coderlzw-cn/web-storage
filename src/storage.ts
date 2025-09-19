@@ -606,6 +606,258 @@ export default class WebStorage {
   }
 
   /**
+   * 删除指定键的存储数据
+   * @param key - 存储键名
+   */
+  remove(key: string): void {
+    try {
+      this.validateKey(key);
+
+      const fullKey = this.getFullKey(key);
+      const existed = this.storage.getItem(fullKey) !== null;
+
+      this.storage.removeItem(fullKey);
+
+      if (this.debug) {
+        console.log(
+          `%c🗑️ REMOVE %c${key} %c- ${existed ? 'success' : 'not found'}`,
+          'color: #F44336; font-size: 12px; font-family: monospace;',
+          'color: #FF9800; font-size: 12px; font-family: monospace;',
+          'color: #4CAF50; font-size: 12px; font-family: monospace;',
+          {
+            fullKey,
+            existed,
+            timestamp: new Date().toLocaleTimeString(),
+          }
+        );
+      }
+    } catch (error) {
+      const err =
+        error instanceof Error ? error : new Error('Remove operation failed');
+      this.handleError(err);
+      throw err;
+    }
+  }
+
+  /**
+   * 检查指定键是否存在
+   * @param key - 存储键名
+   * @returns 键是否存在
+   */
+  has(key: string): boolean {
+    try {
+      this.validateKey(key);
+
+      const fullKey = this.getFullKey(key);
+      const exists = this.storage.getItem(fullKey) !== null;
+
+      if (this.debug) {
+        console.log(
+          `%c🔍 HAS %c${key} %c- ${exists ? 'exists' : 'not found'}`,
+          'color: #9C27B0; font-size: 12px; font-family: monospace;',
+          'color: #FF9800; font-size: 12px; font-family: monospace;',
+          'color: #4CAF50; font-size: 12px; font-family: monospace;',
+          {
+            fullKey,
+            exists,
+            timestamp: new Date().toLocaleTimeString(),
+          }
+        );
+      }
+
+      return exists;
+    } catch (error) {
+      const err =
+        error instanceof Error ? error : new Error('Has operation failed');
+      this.handleError(err);
+      return false;
+    }
+  }
+
+  /**
+   * 获取存储项数量
+   * @returns 存储项数量
+   */
+  size(): number {
+    try {
+      const prefixPattern = this.prefix ? `${this.prefix}:` : '';
+      let count = 0;
+
+      for (let i = 0; i < this.storage.length; i++) {
+        const key = this.storage.key(i);
+        if (key && (key.startsWith(prefixPattern) || !this.prefix)) {
+          count++;
+        }
+      }
+
+      if (this.debug) {
+        console.log(
+          `%c📊 SIZE %c- ${count} items`,
+          'color: #607D8B; font-size: 12px; font-family: monospace;',
+          'color: #4CAF50; font-size: 12px; font-family: monospace;',
+          {
+            count,
+            prefix: this.prefix,
+            timestamp: new Date().toLocaleTimeString(),
+          }
+        );
+      }
+
+      return count;
+    } catch (error) {
+      const err =
+        error instanceof Error ? error : new Error('Size operation failed');
+      this.handleError(err);
+      return 0;
+    }
+  }
+
+  /**
+   * 获取所有键名
+   * @returns 键名数组
+   */
+  keys(): string[] {
+    try {
+      const keys: string[] = [];
+      const prefixPattern = this.prefix ? `${this.prefix}:` : '';
+
+      for (let i = 0; i < this.storage.length; i++) {
+        const key = this.storage.key(i);
+        if (key && (key.startsWith(prefixPattern) || !this.prefix)) {
+          // 如果有前缀，移除前缀返回原始键名
+          const originalKey = this.prefix
+            ? key.replace(`${this.prefix}:`, '')
+            : key;
+          keys.push(originalKey);
+        }
+      }
+
+      if (this.debug) {
+        console.log(
+          `%c🔑 KEYS %c- ${keys.length} keys`,
+          'color: #FF9800; font-size: 12px; font-family: monospace;',
+          'color: #4CAF50; font-size: 12px; font-family: monospace;',
+          {
+            keys,
+            prefix: this.prefix,
+            timestamp: new Date().toLocaleTimeString(),
+          }
+        );
+      }
+
+      return keys;
+    } catch (error) {
+      const err =
+        error instanceof Error ? error : new Error('Keys operation failed');
+      this.handleError(err);
+      return [];
+    }
+  }
+
+  /**
+   * 获取所有值
+   * @returns 值数组
+   */
+  values<T = any>(): T[] {
+    try {
+      const keys = this.keys();
+      const values: T[] = [];
+
+      for (const key of keys) {
+        const value = this.get<T>(key);
+        if (value !== null) {
+          values.push(value);
+        }
+      }
+
+      if (this.debug) {
+        console.log(
+          `%c📦 VALUES %c- ${values.length} values`,
+          'color: #2196F3; font-size: 12px; font-family: monospace;',
+          'color: #4CAF50; font-size: 12px; font-family: monospace;',
+          {
+            values,
+            timestamp: new Date().toLocaleTimeString(),
+          }
+        );
+      }
+
+      return values;
+    } catch (error) {
+      const err =
+        error instanceof Error ? error : new Error('Values operation failed');
+      this.handleError(err);
+      return [];
+    }
+  }
+
+  /**
+   * 获取所有键值对
+   * @returns 键值对数组
+   */
+  entries<T = any>(): [string, T][] {
+    try {
+      const keys = this.keys();
+      const entries: [string, T][] = [];
+
+      for (const key of keys) {
+        const value = this.get<T>(key);
+        if (value !== null) {
+          entries.push([key, value]);
+        }
+      }
+
+      if (this.debug) {
+        console.log(
+          `%c📋 ENTRIES %c- ${entries.length} entries`,
+          'color: #9C27B0; font-size: 12px; font-family: monospace;',
+          'color: #4CAF50; font-size: 12px; font-family: monospace;',
+          {
+            entries,
+            timestamp: new Date().toLocaleTimeString(),
+          }
+        );
+      }
+
+      return entries;
+    } catch (error) {
+      const err =
+        error instanceof Error ? error : new Error('Entries operation failed');
+      this.handleError(err);
+      return [];
+    }
+  }
+
+  /**
+   * 检查存储是否为空
+   * @returns 是否为空
+   */
+  isEmpty(): boolean {
+    try {
+      const empty = this.size() === 0;
+
+      if (this.debug) {
+        console.log(
+          `%c📭 IS_EMPTY %c- ${empty ? 'empty' : 'not empty'}`,
+          'color: #757575; font-size: 12px; font-family: monospace;',
+          'color: #4CAF50; font-size: 12px; font-family: monospace;',
+          {
+            empty,
+            timestamp: new Date().toLocaleTimeString(),
+          }
+        );
+      }
+
+      return empty;
+    } catch (error) {
+      const err =
+        error instanceof Error ? error : new Error('IsEmpty operation failed');
+      this.handleError(err);
+      return true;
+    }
+  }
+
+  /**
    * 清空所有相关存储数据
    */
   clearAll(): void {
